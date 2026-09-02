@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>chara-vocab Minimal Input Prototype v2</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--line:#e5e7eb;--text:#171717;--muted:#6b7280;--accent:#111827;--soft:#f3f4f6;--warn:#fff7ed;--warnline:#fed7aa;--star:#f59e0b}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text);line-height:1.5}.wrap{max-width:1180px;margin:auto;padding:26px 18px 50px}.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}.head h1{margin:0;font-size:28px}.sub{font-size:13px;color:var(--muted);margin-top:5px}.badge{font-size:12px;background:#111827;color:#fff;padding:6px 9px;border-radius:999px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}.section{padding:20px;border-bottom:1px solid var(--line)}.section:last-child{border-bottom:none}.section h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:0 0 14px}.row{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}input,select,textarea{width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fff;color:var(--text)}textarea{min-height:88px;resize:vertical}.category{padding:13px 0;border-top:1px dashed var(--line)}.category:first-of-type{border-top:none;padding-top:0}.cat-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}.cat-title{font-weight:800;font-size:14px}.cat-note{font-size:11px;color:var(--muted)}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:8px 11px;font-size:14px;cursor:pointer;transition:.12s;user-select:none}.chip:hover{transform:translateY(-1px)}.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}.seg-wrap{display:flex;align-items:center;gap:10px;margin-top:10px}.seg-label{font-size:13px;font-weight:700;min-width:72px}.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}.seg button{border:0;border-right:1px solid var(--line);background:#fff;padding:8px 12px;cursor:pointer;font:inherit;font-size:13px}.seg button:last-child{border-right:0}.seg button.active{background:var(--accent);color:#fff}.selected-help{margin-top:10px;font-size:12px;color:#4b5563;min-height:18px}.more{margin-top:12px}.more summary{cursor:pointer;font-weight:700;font-size:13px;color:#374151}.adaptive{margin-top:12px;padding:12px;border:1px solid var(--warnline);background:var(--warn);border-radius:12px}.adaptive h4{margin:0 0 5px;font-size:13px}.adaptive p{margin:0 0 9px;font-size:12px;color:#7c2d12}.adaptive .seg{background:transparent}.starbox{margin-top:12px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fafafa}.starbox strong{font-size:13px}.starbox .desc2{font-size:11px;color:var(--muted);margin:2px 0 8px}.star-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:13px}.star-chip.active{border-color:var(--star);background:#fffbeb}.star-chip.active:before{content:"★ ";color:var(--star)}.culture-grid{display:flex;flex-wrap:wrap;gap:7px}.culture{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:13px}.culture.active{background:#111827;color:#fff;border-color:#111827}.culture.core{outline:3px solid #fde68a;outline-offset:1px}.hint{font-size:11px;color:var(--muted);margin-top:9px}.side{position:sticky;top:16px}.preview{padding:17px}.preview h3{font-size:16px;margin:0 0 10px}.metric{display:flex;gap:8px;margin-bottom:10px}.metric div{flex:1;background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:9px}.metric b{display:block;font-size:18px}.metric span{font-size:10px;color:var(--muted)}.summary{background:#0f172a;color:#e5e7eb;padding:13px;border-radius:12px;white-space:pre-wrap;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:600px;overflow:auto}.actions{display:flex;gap:8px;margin-top:10px}.actions button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}.clear{background:#eef2f7}.copy{background:#111827;color:#fff;flex:1}@media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static}.row{grid-template-columns:1fr 1fr}}@media(max-width:560px){.row{grid-template-columns:1fr}.seg-wrap{display:block}.seg-label{margin-bottom:5px}.seg{display:flex}.seg button{flex:1;padding:8px 6px}.head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="head"><div><h1>chara-vocab 入力試作 v2</h1><div class="sub">少ない操作で、キャラクター像の差が大きくなる入力だけを優先した試作</div></div><div class="badge">既存UIとは別案</div></div>
+<div class="layout">
+<main class="panel">
+<section class="section">
+<h2>1. どんな人？</h2><p class="desc">基本情報はすべて任意。設定したいものだけ。</p>
+<div class="row"><input id="name" placeholder="名前"><input id="age" placeholder="年代 例: 20代"><select id="gender"><option value="">性別</option><option>女性</option><option>男性</option><option>その他 / 指定しない</option></select><input id="role" placeholder="立場 例: 会社員"></div>
+</section>
+<section class="section">
+<h2>2. 性格・振る舞い</h2><p class="desc">この人らしいものだけ選択。目安は2〜4個。意味が違うものは同時に選べます。</p>
+<div class="category"><div class="cat-head"><div class="cat-title">会話の表面</div><div class="cat-note">会話ですぐ差が出る</div></div><div class="chips" id="surfaceTraits"></div><div class="seg-wrap"><div class="seg-label">会話量</div><div class="seg" data-seg="talk"><button data-value="無口">無口</button><button data-value="">指定なし</button><button data-value="おしゃべり">おしゃべり</button></div></div></div>
+<div class="category"><div class="cat-head"><div class="cat-title">人との接し方</div><div class="cat-note">対人会話への影響が大きい</div></div><div class="chips" id="socialTraits"></div></div>
+<div class="category"><div class="cat-head"><div class="cat-title">行動・反応</div><div class="cat-note">出来事への反応を変える</div></div><div class="chips" id="reactionTraits"></div></div>
+<details class="more"><summary>＋ もう少し設定</summary><div class="category" style="margin-top:10px"><div class="chips" id="moreTraits"></div></div></details>
+<div class="selected-help" id="traitHelp">タグにカーソルを合わせると意味を確認できます。</div>
+<div class="starbox" id="traitStarBox" hidden><strong>特に「この人らしい」ものは？</strong><div class="desc2">4個以上選んだときだけ表示。最大2個。必須ではありません。</div><div class="chips" id="traitStars"></div></div>
+<div id="adaptiveArea"></div>
+</section>
+<section class="section">
+<h2>3. 何が好き？</h2><p class="desc">当てはまるものを選択。特にキャラクターを形作るものだけ ★ にできます。</p>
+<div class="culture-grid" id="cultures"></div><div class="starbox" id="cultureCoreBox" hidden><strong>特にこの人らしいCulture</strong><div class="desc2">選択した中から最大1個。Cultureごとの4段階入力を省けるか試すための案です。</div><div class="chips" id="cultureStars"></div></div>
+</section>
+<section class="section">
+<h2>4. あなたとの関係</h2><p class="desc">関係と、現在あなたをどう思っているかだけ指定。</p>
+<div class="row" style="grid-template-columns:1fr 1fr"><select id="relationship"><option value="">関係を選択</option><option>初対面</option><option>知人</option><option>友人</option><option>昔からの親しい友人</option><option>恋人</option><option>同僚</option><option>上司</option><option>部下</option><option>家族</option></select><select id="stance"><option value="">あなたへの態度（未指定）</option><option>好意的</option><option>普通</option><option>苦手</option><option>嫌い</option></select></div>
+</section>
+<section class="section">
+<h2>5. その他、この人らしい特徴</h2><p class="desc">選択肢で表しにくい特徴だけ、任意で1〜2文。</p><textarea id="notes" placeholder="例：初対面では静かだが、慣れると急に喋る。親しい人には口が悪い。"></textarea>
+</section>
+</main>
+<aside class="panel side"><div class="preview"><h3>入力の確認</h3><div class="metric"><div><b id="mainCount">0</b><span>主な選択</span></div><div><b id="clarifyCount">0</b><span>追加確認</span></div></div><div class="summary" id="preview"></div><div class="actions"><button class="clear" id="clearBtn">クリア</button><button class="copy" id="copyBtn">入力をコピー</button></div><div class="hint">追加確認は、選択の組み合わせで人物像が分岐するときだけ表示します。</div></div></aside>
+</div>
+</div>
+<script>
+const traitGroups={
+ surface:[
+  ["明るい","軽快で前向きな雰囲気が出やすい"],
+  ["落ち着いている","感情的に荒れにくく、安定して反応しやすい"],
+  ["感情豊か","内面の感情が動きやすく、感情を含めて受け止めやすい"],
+  ["淡々","感情を表面へ大きく出さず、あっさり表現しやすい"]
+ ],
+ social:[
+  ["強気","自分の意見を比較的はっきり言う"],
+  ["社交的","人との交流へ自分から入りやすい"],
+  ["人見知り","慣れていない相手には最初から入りにくい"],
+  ["世話焼き","困っていると、つい口や手を出しやすい"],
+  ["深入りしない","気には掛けても、必要以上には踏み込まない"],
+  ["からかい好き","親しい相手の軽い失敗や反応を茶化しやすい"]
+ ],
+ reaction:[
+  ["マイペース","周囲の速度より自分のペースを保ちやすい"],
+  ["せっかち","待つより早く進めたがる"],
+  ["短気","遅さや不快な対応に苛立ちやすい"],
+  ["面倒くさがり","手間・責任・揉め事を避けやすい"],
+  ["自分優先","自分の時間や快適さを削ってまで他人を優先しにくい"]
+ ],
+ more:[
+  ["慎重","判断や行動の前に確認しやすい"],
+  ["大胆","多少のリスクがあっても進みやすい"],
+  ["几帳面","整理や細部をきちんと揃えやすい"],
+  ["大雑把","細部より全体を優先しやすい"],
+  ["頑固","一度決めた考えを変えにくい"],
+  ["柔軟","状況や相手に合わせて考えを変えやすい"],
+  ["衝動的","十分に考える前に勢いで動きやすい"],
+  ["意地悪","相手が嫌がると分かっていても続けたり面白がったりしやすい"],
+  ["見下しがち","相手の失敗や能力不足を低く評価しやすい"],
+  ["支配的","相手や集団も自分の方向へ動かしたがる"],
+  ["打算的","相手や状況、自分の損得を見ながら振る舞いやすい"],
+  ["仕返し好き","自分へ不利益を与えた相手へやり返したくなりやすい"]
+ ]
+};
+const cultureList=["少女漫画","少年漫画","ミステリ","純文学","ゲーム","音楽","映画","料理","心理学","哲学","科学","社会学","X・短文SNS"];
+const selected={traits:new Set(),stars:new Set(),talk:"",cultures:new Set(),cultureCore:"",clarifications:{}};
+const helpMap={};
+Object.values(traitGroups).flat().forEach(([n,d])=>helpMap[n]=d);
+function makeTraitGroup(id,group){const root=document.getElementById(id);traitGroups[group].forEach(([name,desc])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=name;b.title=desc;b.onmouseenter=()=>document.getElementById("traitHelp").textContent=`${name}：${desc}`;b.onmouseleave=()=>document.getElementById("traitHelp").textContent="タグにカーソルを合わせると意味を確認できます。";b.onclick=()=>{if(selected.traits.has(name)){selected.traits.delete(name);selected.stars.delete(name);b.classList.remove("active")}else{selected.traits.add(name);b.classList.add("active")}render()};root.appendChild(b)})}
+function setupSegments(){document.querySelectorAll(".seg[data-seg]").forEach(seg=>{seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{const key=seg.dataset.seg;selected[key]=b.dataset.value;seg.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));render()});const neutral=seg.querySelector('button[data-value=""]');if(neutral)neutral.classList.add("active")})}
+function makeCultures(){const root=document.getElementById("cultures");cultureList.forEach(name=>{const b=document.createElement("button");b.type="button";b.className="culture";b.textContent=name;b.onclick=()=>{if(selected.cultures.has(name)){selected.cultures.delete(name);if(selected.cultureCore===name)selected.cultureCore="";b.classList.remove("active","core")}else{selected.cultures.add(name);b.classList.add("active")}render()};root.appendChild(b)})}
+function val(id){return document.getElementById(id).value.trim()}
+function renderTraitStars(){const box=document.getElementById("traitStarBox"),root=document.getElementById("traitStars");root.innerHTML="";box.hidden=selected.traits.size<4;if(box.hidden){selected.stars.clear();return}selected.traits.forEach(name=>{const b=document.createElement("button");b.type="button";b.className="star-chip"+(selected.stars.has(name)?" active":"");b.textContent=name;b.onclick=()=>{if(selected.stars.has(name))selected.stars.delete(name);else{if(selected.stars.size>=2)return;selected.stars.add(name)}render()};root.appendChild(b)})}
+function renderCultureStars(){const box=document.getElementById("cultureCoreBox"),root=document.getElementById("cultureStars");root.innerHTML="";box.hidden=selected.cultures.size<2;if(box.hidden){selected.cultureCore="";return}selected.cultures.forEach(name=>{const b=document.createElement("button");b.type="button";b.className="star-chip"+(selected.cultureCore===name?" active":"");b.textContent=name;b.onclick=()=>{selected.cultureCore=selected.cultureCore===name?"":name;render()};root.appendChild(b)});document.querySelectorAll(".culture").forEach(b=>b.classList.toggle("core",selected.cultureCore&&b.textContent===selected.cultureCore))}
+function choiceCard(id,title,text,options){const wrap=document.createElement("div");wrap.className="adaptive";wrap.innerHTML=`<h4>${title}</h4><p>${text}</p>`;const seg=document.createElement("div");seg.className="seg";options.forEach(opt=>{const b=document.createElement("button");b.type="button";b.textContent=opt;b.classList.toggle("active",selected.clarifications[id]===opt);b.onclick=()=>{selected.clarifications[id]=selected.clarifications[id]===opt?"":opt;render()};seg.appendChild(b)});wrap.appendChild(seg);return wrap}
+function renderAdaptive(){const root=document.getElementById("adaptiveArea");root.innerHTML="";const wanted=new Set();if(selected.traits.has("社交的")&&selected.traits.has("人見知り")){wanted.add("social_shy");root.appendChild(choiceCard("social_shy","追加確認：初対面では？","「社交的 + 人見知り」の出方だけ確認します。",["かなり静か","少し様子を見る","普通に話せる"]))}if(selected.traits.has("感情豊か")&&selected.traits.has("淡々")){wanted.add("emotion_surface");root.appendChild(choiceCard("emotion_surface","追加確認：感情の出し方","この組み合わせなら、内面と表面の関係だけ確認します。",["内心は強いが表に出さない","場面によって出す","特に指定しない"]))}if(selected.traits.has("慎重")&&selected.traits.has("大胆")){wanted.add("cautious_bold");root.appendChild(choiceCard("cautious_bold","追加確認：慎重 + 大胆","どの形の組み合わせに近いですか？",["準備は慎重・行動は大胆","リスクは取るがよく考える","特に指定しない"]))}Object.keys(selected.clarifications).forEach(k=>{if(!wanted.has(k))delete selected.clarifications[k]})}
+function buildSummary(){const out=[];const basic=[val("name"),val("age"),val("gender"),val("role")].filter(Boolean);out.push("【基本】");out.push(basic.length?basic.join(" / "):"未指定");out.push("\n【性格】");const ts=[...selected.traits];if(selected.talk)ts.push(selected.talk);out.push(ts.length?ts.map(x=>selected.stars.has(x)?`★ ${x}`:`・${x}`).join("\n"):"未指定");out.push("\n【Culture】");out.push(selected.cultures.size?[...selected.cultures].map(x=>selected.cultureCore===x?`★ ${x}`:`・${x}`).join("\n"):"未指定");out.push("\n【関係】");out.push(`${val("relationship")||"未指定"} / ${val("stance")||"態度未指定"}`);const cs=Object.entries(selected.clarifications).filter(([,v])=>v);if(cs.length){out.push("\n【追加確認】");cs.forEach(([,v])=>out.push(`・${v}`))}if(val("notes")){out.push("\n【自由記述】");out.push(val("notes"))}return out.join("\n")}
+function render(){renderTraitStars();renderCultureStars();renderAdaptive();document.getElementById("mainCount").textContent=selected.traits.size+(selected.talk?1:0)+selected.cultures.size+(val("relationship")?1:0)+(val("stance")?1:0);document.getElementById("clarifyCount").textContent=Object.values(selected.clarifications).filter(Boolean).length;document.getElementById("preview").textContent=buildSummary()}
+["name","age","gender","role","relationship","stance","notes"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(buildSummary());const b=document.getElementById("copyBtn");const t=b.textContent;b.textContent="コピーしました";setTimeout(()=>b.textContent=t,1000)};
+document.getElementById("clearBtn").onclick=()=>{selected.traits.clear();selected.stars.clear();selected.talk="";selected.cultures.clear();selected.cultureCore="";selected.clarifications={};document.querySelectorAll(".chip,.culture,.star-chip,.seg button").forEach(x=>x.classList.remove("active","core"));document.querySelectorAll('.seg button[data-value=""]').forEach(x=>x.classList.add("active"));["name","age","gender","role","relationship","stance","notes"].forEach(id=>document.getElementById(id).value="");render()};
+makeTraitGroup("surfaceTraits","surface");makeTraitGroup("socialTraits","social");makeTraitGroup("reactionTraits","reaction");makeTraitGroup("moreTraits","more");setupSegments();makeCultures();render();
+</script>
+</body>
+</html>
