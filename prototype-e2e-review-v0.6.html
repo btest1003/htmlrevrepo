@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>chara-vocab Character Builder v0.6</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5f6f8}#app{display:block;width:100%;height:100%;border:0;background:#f5f6f8}
+</style>
+</head>
+<body>
+<iframe id="app" src="prototype-e2e-review-v0.5.html" title="chara-vocab Character Builder"></iframe>
+<script type="text/plain" id="enhancerCode">
+(() => {
+  const d = document;
+  const style = d.createElement('style');
+  style.textContent = `
+    .head{display:flex;justify-content:space-between;gap:16px;align-items:end}.head:after{content:"E2E Review v0.6";font-size:11px;font-weight:800;background:#20242a;color:#fff;padding:6px 9px;border-radius:999px}
+    .category{padding:13px 0;border-top:1px dashed var(--line)}.category:first-child{border-top:0;padding-top:0}
+    .cat-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px}.cat-title{font-size:14px;font-weight:800}.cat-note{font-size:11px;color:var(--muted)}
+    .seg-wrap{display:flex;align-items:center;gap:10px;margin-top:10px}.seg-label{font-size:13px;font-weight:800;min-width:70px}.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;border-right:1px solid var(--line);background:#fff;padding:8px 11px;font:inherit;font-size:13px;cursor:pointer}.seg button:last-child{border-right:0}.seg button.active{background:var(--accent);color:#fff}
+    .trait-help{font-size:12px;color:#4c535c;min-height:20px;margin-top:10px}.trait-advanced{margin-top:12px}.trait-advanced summary{font-weight:800}
+    .culture-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.culture{min-width:0}.culture.selected{border-color:#7b8490;background:#fafbfc}.levels{flex-wrap:nowrap}.lvl.off{order:-1;font-size:12px;color:var(--muted)}
+    .reviewFold{margin:0}.reviewFold>summary{padding:18px 20px;font-size:16px;font-weight:800;list-style-position:inside}.reviewFold[open]>summary{border-bottom:1px solid var(--line)}.reviewFold>.desc,.reviewFold>.row,.reviewFold>textarea,.reviewFold>.reviewgrid,.reviewFold>.actions,.reviewFold>.notice{margin-left:20px;margin-right:20px}.reviewFold>.desc{margin-top:14px}.reviewFold>.actions,.reviewFold>.notice{margin-bottom:18px}.reviewFold>textarea{width:calc(100% - 40px)}
+    @media(max-width:720px){.culture-grid{grid-template-columns:1fr}.seg-wrap{display:block}.seg-label{margin-bottom:6px}.seg{display:flex}.seg button{flex:1}.head{align-items:flex-start}.head:after{display:none}}
+  `;
+  d.head.appendChild(style);
+
+  d.querySelector('.head h1').textContent = 'chara-vocab キャラクター作成';
+  d.querySelector('.head p').textContent = '少ない入力で人物像を作り、AIへ貼るCompiler用Promptまで生成します。';
+
+  const oldAge = d.getElementById('age');
+  const age = d.createElement('select');
+  age.id = 'age';
+  age.innerHTML = '<option value="">年齢（任意）</option>' + Array.from({length:121},(_,i)=>`<option value="${i}">${i}歳</option>`).join('');
+  oldAge.replaceWith(age);
+  age.addEventListener('change', bump);
+
+  const baseSparse = sparse;
+  sparse = function(){ return baseSparse().replace(/^  age_range:/m, '  age:'); };
+
+  const traitSection = [...d.querySelectorAll('.section')].find(s => s.querySelector('h2')?.textContent.startsWith('2.'));
+  const allButtons = [...d.querySelectorAll('#coreTraits .chip, #moreTraits .chip')];
+  const buttonByName = new Map(allButtons.map(b => [b.textContent.trim(), b]));
+  const oldCore = d.getElementById('coreTraits');
+  const oldMoreDetails = d.getElementById('moreTraits')?.closest('details');
+  const traitCountEl = d.getElementById('traitCount');
+
+  const groups = {
+    surface: {title:'会話の表面', note:'会話ですぐ差が出る', items:['明るい','落ち着いている','感情豊か','淡々']},
+    social: {title:'人との接し方', note:'対人会話への影響が大きい', items:['強気','控えめ','社交的','人見知り','世話焼き','深入りしない','からかい好き']},
+    reaction: {title:'行動・反応', note:'出来事への反応を変える', items:['マイペース','せっかち','短気','面倒くさがり','自分優先']},
+    more: {title:'もう少し設定', note:'必要な時だけ', items:['慎重','大胆','几帳面','大雑把','頑固','柔軟','衝動的','意地悪','見下しがち','支配的','打算的','仕返し好き']}
+  };
+
+  const holder = d.createElement('div');
+  holder.id = 'traitCategories';
+  function makeCategory(g){
+    const wrap = d.createElement('div'); wrap.className='category';
+    const head = d.createElement('div'); head.className='cat-head';
+    head.innerHTML = `<div class="cat-title">${g.title}</div><div class="cat-note">${g.note}</div>`;
+    const chips = d.createElement('div'); chips.className='chips';
+    g.items.forEach(name => { const b=buttonByName.get(name); if(b) chips.appendChild(b); });
+    wrap.append(head,chips); return wrap;
+  }
+  holder.appendChild(makeCategory(groups.surface));
+
+  const talkWrap = d.createElement('div'); talkWrap.className='seg-wrap';
+  talkWrap.innerHTML = '<div class="seg-label">会話量</div><div class="seg" id="talkSegV06"><button data-v="無口">無口</button><button data-v="" class="active">指定なし</button><button data-v="おしゃべり">おしゃべり</button></div>';
+  holder.lastElementChild.appendChild(talkWrap);
+  holder.appendChild(makeCategory(groups.social));
+  holder.appendChild(makeCategory(groups.reaction));
+
+  const advanced = d.createElement('details'); advanced.className='trait-advanced';
+  advanced.innerHTML='<summary>＋ もう少し設定</summary>';
+  advanced.appendChild(makeCategory(groups.more));
+  holder.appendChild(advanced);
+
+  const help = d.createElement('div'); help.className='trait-help'; help.textContent='Traitにカーソルを合わせると意味を確認できます。';
+  holder.appendChild(help);
+
+  allButtons.forEach(b => {
+    const name=b.textContent.trim();
+    b.title = traitData[name]?.m || b.title;
+    b.addEventListener('mouseenter',()=>{help.textContent=`${name}：${traitData[name]?.m||''}`});
+    b.addEventListener('focus',()=>{help.textContent=`${name}：${traitData[name]?.m||''}`});
+  });
+
+  const hiddenTalk = d.createElement('div'); hiddenTalk.style.display='none';
+  ['無口','おしゃべり'].forEach(n=>{const b=buttonByName.get(n); if(b) hiddenTalk.appendChild(b)});
+  holder.appendChild(hiddenTalk);
+
+  traitSection.insertBefore(holder, traitCountEl);
+  oldCore.remove(); if(oldMoreDetails) oldMoreDetails.remove();
+
+  const talkButtons=[...d.querySelectorAll('#talkSegV06 button')];
+  talkButtons.forEach(btn=>btn.onclick=()=>{
+    const desired=btn.dataset.v;
+    const current=selected.has('無口')?'無口':selected.has('おしゃべり')?'おしゃべり':'';
+    if(current===desired) return;
+    const withoutTalk=selected.size-(current?1:0);
+    if(desired && withoutTalk>=6){ alert('Traitは最大6個です。いずれかを外してから選択してください。'); return; }
+    selected.delete('無口'); selected.delete('おしゃべり');
+    if(desired) selected.add(desired);
+    actions++;
+    render();
+  });
+
+  d.querySelectorAll('.culture').forEach(row=>{
+    const levels=row.querySelector('.levels');
+    const off=d.createElement('button'); off.type='button'; off.className='lvl off'; off.textContent='×'; off.title='未選択に戻す';
+    off.onclick=()=>{const active=levels.querySelector('.lvl.active:not(.off)'); if(active) active.click();};
+    levels.appendChild(off);
+    const small=row.querySelector('.culture-name small'); if(small) small.textContent='1 軽め / 2 好き / 3 かなり / 4 生活の一部';
+  });
+
+  const reviewSection=[...d.querySelectorAll('.section')].find(s=>s.querySelector('h2')?.textContent.startsWith('6.'));
+  if(reviewSection){
+    const details=d.createElement('details'); details.className='reviewFold';
+    const summary=d.createElement('summary'); summary.textContent='6. 実会話後のReview（会話テスト後に開く）';
+    details.appendChild(summary);
+    const originals=[...reviewSection.childNodes];
+    reviewSection.insertBefore(details, reviewSection.firstChild);
+    originals.forEach(n=>{ if(n.nodeType===1 && n.tagName==='H2'){n.remove(); return;} details.appendChild(n); });
+  }
+
+  function humanSummary(){
+    const ageText=v('age') ? `${v('age')}歳` : '未指定';
+    const cs=Object.entries(selected.cultures).filter(([,level])=>level).map(([name,level])=>`${name} Lv${level}`).join(' / ') || '未指定';
+    return [
+      `名前: ${v('name')||'未指定'}`,
+      `年齢: ${ageText}`,
+      `性別: ${v('gender')||'未指定'}`,
+      `立場: ${v('role')||'未指定'}`,
+      `Trait: ${[...selected].join(' / ')||'未指定'}`,
+      `Culture: ${cs}`,
+      `関係: ${v('relationship')||'未指定'}`,
+      `態度: ${v('stance')||'未指定'}`,
+      `Free Note: ${v('notes')||'なし'}`
+    ].join('\n');
+  }
+
+  const baseRender = render;
+  render = function(){
+    baseRender();
+    talkButtons.forEach(b=>b.classList.toggle('active', selected.has(b.dataset.v) || (!b.dataset.v && !selected.has('無口') && !selected.has('おしゃべり'))));
+    d.querySelectorAll('.culture').forEach(row=>row.classList.toggle('selected', !!row.querySelector('.lvl.active:not(.off)')));
+    if(activeTab==='input') d.getElementById('preview').textContent=humanSummary();
+  };
+
+  const requestTab=d.querySelector('.tab[data-tab="request"]');
+  const inputTab=d.querySelector('.tab[data-tab="input"]');
+  inputTab.textContent='入力確認'; requestTab.textContent='Compiler Prompt';
+  inputTab.parentElement.insertBefore(inputTab, requestTab);
+  activeTab='input';
+  d.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===inputTab));
+
+  render();
+})();
+</script>
+<script>
+const frame=document.getElementById('app');
+frame.addEventListener('load',()=>{
+  const code=document.getElementById('enhancerCode').textContent;
+  const script=frame.contentDocument.createElement('script');
+  script.textContent=code;
+  frame.contentDocument.body.appendChild(script);
+});
+</script>
+</body>
+</html>
