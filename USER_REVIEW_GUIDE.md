@@ -1,8 +1,10 @@
 # chara-vocab End-to-End User Review Guide v0.5
 
-Status: **DESIGN READY / UI IMPLEMENTATION NOT YET COMPLETE**
+Status: **E2E PROTOTYPE READY FOR MANUAL REVIEW**
 
-現在の `prototype-user-review-v1.html` は入力UIだけを確認する旧Prototypeであり、v0.5のEnd-to-End Review完成版ではありません。
+対象ページ：`prototype-e2e-review-v0.5.html`
+
+旧 `prototype-user-review-v1.html` は入力UIだけを確認する比較用Prototypeとして残す。
 
 ## 目的
 
@@ -17,19 +19,23 @@ Status: **DESIGN READY / UI IMPLEMENTATION NOT YET COMPLETE**
 ## Canonical Review Flow
 
 ```text
-1. UIでキャラクターを入力
+1. prototype-e2e-review-v0.5.html でキャラクターを入力
 ↓
 2. UIが自己完結Portable Compiler Requestを生成
 ↓
-3. Fresh AI Chat Aへ貼る
+3. [Compiler用Promptをコピー]
 ↓
-4. Standalone Production RP Promptを取得
+4. Fresh AI Chat Aへ貼る
 ↓
-5. Fresh AI Chat Bへ貼る
+5. Standalone Production RP Promptを取得
 ↓
-6. 複数Scene / 複数Turnで実際に会話
+6. そのPromptをFresh AI Chat Bへ貼る
 ↓
-7. User Review
+7. 複数Scene / 複数Turnで実際に会話
+↓
+8. UIのReview欄へ結果を記録
+↓
+9. [Review保存] または [Review Packetをコピー]
 ```
 
 Chat A / Bは開発会話とは別のFresh Chatを推奨する。既存会話の背景知識が結果を補完するのを避けるため。
@@ -42,10 +48,10 @@ Chat A / Bは開発会話とは別のFresh Chatを推奨する。既存会話の
 
 ```text
 2〜4個推奨
-6個上限目安
+最大6個
 ```
 
-Stable Traitを基本とし、Advanced Candidateは「もう少し設定」等へ表示してHuman Reviewしてよい。
+Stable Traitを基本とし、Advanced Candidateは「もう少し設定」へ表示する。Candidateを選べることはStable昇格を意味しない。
 
 ### Culture
 
@@ -70,7 +76,7 @@ CultureはUIの中心入力。
 
 通常0問。
 
-現時点では `感情豊か + 淡々` のみ1問候補。
+現時点では `感情豊か + 淡々` のみ1問候補。未回答でもSoft DefaultでCompileできる。
 
 ### Free Note
 
@@ -78,18 +84,54 @@ CultureはUIの中心入力。
 
 ---
 
-## 最初のReview Run
+## Portable Compiler Request
 
-最初は自由に1キャラクターを作る。
-
-見るもの：
+ページは以下を自動で結合する。
 
 ```text
-入力負荷
-Portable Compiler Requestが正しく生成されたか
-Production Promptが入力の意味を保持したか
-実際のRP Responseが想像した人物に近いか
+Compiler共通Rule
+選択TraitのCanonical Contribution / Boundary
+該当Mixed Rule
+選択CultureのFeature / Level / Suppression
+Relationship / User Stance
+Free Note / Detail Rule
+Deception Guard
+Sparse Character Input
+Consistency Checklist
+Output Contract
 ```
+
+UI自身は人格を解釈しない。選択されたCanonical Snippetを機械的に結合するだけ。
+
+---
+
+## 最初のReview Run
+
+最初の代表ケース：
+
+```text
+年代: 10代
+性別: 女性
+
+Trait:
+- 仕返し好き
+- 意地悪
+- 自分優先
+- 落ち着いている
+- 人見知り
+
+Culture:
+- 少女漫画
+- X・短文SNS
+
+Relationship:
+- 知り合い
+
+User Stance:
+- 苦手
+```
+
+Culture Levelは最初のRunでは、少女漫画=2、X・短文SNS=4を暫定Baselineとして使える。Level自体もHuman Review対象なので、想像と合わなければ次Runで変更する。
 
 ---
 
@@ -99,14 +141,23 @@ Production Promptが入力の意味を保持したか
 
 ```text
 A casual
-B user vulnerability / emotion
-C relationship-specific
-D personality high-signal
-E culture-relevant
-F culture-irrelevant / neutral control
-```
+「今日なんか暇だな」
 
-必要なら同じSceneを複数回生成し、model varianceも確認する。
+B user vulnerability / emotion
+「今日ちょっと仕事で失敗した」
+
+C relationship-specific
+「なんか俺のこと苦手？」
+
+D personality high-signal
+「前にお前にやられたこと、まだ覚えてる？」
+
+E culture-relevant
+「少女漫画って何が面白いの？」
+
+F culture-irrelevant control
+「ところで富士山って何メートルだっけ？」
+```
 
 固定Sceneだけでなく、その後2〜3Turn自由会話も行う。
 
@@ -126,9 +177,8 @@ Character Fidelity 1〜5
 ```text
 入力しやすさ
 項目量
-欲しいTrait / Cultureが見つかったか
-迷った項目
-Free Note依存
+Traitの分かりやすさ
+Cultureの分かりやすさ
 ```
 
 ### Output
@@ -137,17 +187,28 @@ Free Note依存
 Personality correctness
 Culture naturalness
 Relationship / User Stance correctness
-Unwanted added personality
-Missing selected feature
 Naturalness
 Consistency across turns
 ```
 
+加えて自由記述で必ず確認する：
+
+```text
+Unwanted added personality
+Missing selected feature
+想像と違ったResponse
+迷った入力
+足りなかった項目
+不要に感じた項目
+```
+
+Production RP Prompt、想像に近かったResponse、問題Responseは診断用として任意保存できる。
+
+Compiler AI / RP AIのmodel名も記録する。
+
 ---
 
 ## Failure Classification
-
-「キャラが違う」で終わらせず、可能なら次へ分類する。
 
 ```text
 A. Input / UI
@@ -197,14 +258,19 @@ Promptは妥当だが、RP AIのその出力だけ外れた
 ## v0.5 Review-ready条件
 
 ```text
-[ ] UIからPersonality 2〜4推奨 / 6上限目安で入力可能
-[ ] Culture 1〜4を入力可能
-[ ] Relationship / User Stance / Free Note入力可能
-[ ] 必要時だけAdaptive表示
-[ ] Portable Compiler Requestを生成・コピー可能
-[ ] Fresh Chat AでStandalone Production RP Prompt生成可能
-[ ] Fresh Chat BでRP可能
-[ ] Review結果を記録可能
+[x] Personality 2〜4推奨 / 最大6
+[x] Culture 13種 × Level 1〜4
+[x] Relationship / User Stance / Free Note
+[x] 感情豊か + 淡々 のAdaptive候補
+[x] Sparse Input Preview
+[x] Portable Compiler Request生成
+[x] ワンクリックCopy
+[x] Compiler / RP model記録欄
+[x] Production Prompt / Response診断保存欄
+[x] Review localStorage保存
+[x] Review Packetコピー
+[ ] Fresh Chat Aで実際にProduction RP Promptを生成するHuman Run
+[ ] Fresh Chat Bで実RPするHuman Run
 ```
 
-現在の次工程は、既存UI PrototypeをこのFlowへ接続すること。
+次工程は、実際のFresh Chat A / Bを使った最初のEnd-to-End Human Review。
