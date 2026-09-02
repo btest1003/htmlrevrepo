@@ -1,121 +1,210 @@
-# chara-vocab User Review Guide
+# chara-vocab End-to-End User Review Guide v0.5
 
-Status: **READY_FOR_USER_REVIEW**
+Status: **DESIGN READY / UI IMPLEMENTATION NOT YET COMPLETE**
 
-対象ページ：`prototype-user-review-v1.html`
+現在の `prototype-user-review-v1.html` は入力UIだけを確認する旧Prototypeであり、v0.5のEnd-to-End Review完成版ではありません。
 
 ## 目的
 
-今回のレビューは、AI生成品質ではなく **人間がキャラクター設定を入力する時の使いやすさ** を確認する。
+最重要の確認項目：
+
+> 少ない入力で、自分が想像していたキャラクターと実際に会話できたか。
+
+入力UIの使いやすさだけでは合否を決めない。
+
+---
+
+## Canonical Review Flow
+
+```text
+1. UIでキャラクターを入力
+↓
+2. UIが自己完結Portable Compiler Requestを生成
+↓
+3. Fresh AI Chat Aへ貼る
+↓
+4. Standalone Production RP Promptを取得
+↓
+5. Fresh AI Chat Bへ貼る
+↓
+6. 複数Scene / 複数Turnで実際に会話
+↓
+7. User Review
+```
+
+Chat A / Bは開発会話とは別のFresh Chatを推奨する。既存会話の背景知識が結果を補完するのを避けるため。
+
+---
+
+## UI Input Baseline
+
+### Personality
+
+```text
+2〜4個推奨
+6個上限目安
+```
+
+Stable Traitを基本とし、Advanced Candidateは「もう少し設定」等へ表示してHuman Reviewしてよい。
+
+### Culture
+
+v0.5 Baseline：
+
+```text
+1 触れる程度
+2 好き
+3 かなり好き
+4 生活の一部
+```
+
+CultureはUIの中心入力。
+
+`Core ★` は入力コスト削減候補として後で比較し、最初のEnd-to-End Baselineにはしない。
+
+### Relationship / User Stance
+
+別々に入力する。
+
+### Adaptive
+
+通常0問。
+
+現時点では `感情豊か + 淡々` のみ1問候補。
+
+### Free Note
+
+選択肢で表現しにくい一点物に使用。Free Note使用自体を失敗扱いしない。
+
+---
+
+## 最初のReview Run
+
+最初は自由に1キャラクターを作る。
 
 見るもの：
 
-- 最初に何を選べばよいか分かるか
-- Traitの意味を区別できるか
-- Main / 「もう少し設定」の分け方が自然か
-- 少ない操作で想像した人物を表現できるか
-- Adaptive確認が必要な場面と不要な場面
-- Culture入力が分かりやすいか
-- Relationship と User Stance の違いが分かるか
-- Free Noteへ頼り過ぎていないか
-- 足りない項目 / 不要な項目 / 迷う項目
-
-今回のレビューでは生成されたRP回答の品質は判定しない。UI入力品質とGeneration Fidelityは別評価として扱う。
+```text
+入力負荷
+Portable Compiler Requestが正しく生成されたか
+Production Promptが入力の意味を保持したか
+実際のRP Responseが想像した人物に近いか
+```
 
 ---
 
-## 推奨レビュー順
+## Character Test Scene
 
-### Run 1 — 自由入力
+最低限、異なる場面を5〜6個試す。
 
-自分が思い浮かべやすいキャラクターを1人、説明を見過ぎず普通に入力する。
+```text
+A casual
+B user vulnerability / emotion
+C relationship-specific
+D personality high-signal
+E culture-relevant
+F culture-irrelevant / neutral control
+```
 
-最初の印象を見るため、できるだけ「正解のTraitを探すテスト」にはしない。
+必要なら同じSceneを複数回生成し、model varianceも確認する。
 
-### Run 2 — Mixed Character
-
-次のような、単純な一方向ではない人物を入力する。
-
-> 人付き合いは嫌いではないが、初対面では慎重。感情は強く動くが表にはあまり出さない。判断前にはよく考えるが、決めた後は大胆に動ける。
-
-見る点：
-
-- 相反して見えるTraitを同時に選べると理解できるか
-- 追加確認が多過ぎないか
-- 「感情豊か + 淡々」の確認が分かりやすいか
-
-### Run 3 — Culture-heavy Character
-
-性格よりも、趣味・媒体・専門分野が会話内容に強く影響する人物を入力する。
-
-例：ミステリ、少女漫画、心理学、ゲーム、音楽などから2〜3個。
-
-見る点：
-
-- Cultureを「好きなもの」として自然に選べるか
-- Core ★ の意味が理解できるか
-- Cultureを1個だけ強くしたい場合に困らないか
-
-### Run 4 — Difficult / Extreme Character
-
-通常Traitだけでは表しにくそうな人物を入力する。
-
-例：かなり献身的、かなり性格が悪い、特定の相手にだけ態度が変わる、状況によって極端に変化する等。
-
-見る点：
-
-- 「もう少し設定」で足りるか
-- Free Noteを使えば自然に補えるか
-- Free Noteがないと表現不能に感じる内容は何か
-- Advanced UIとして追加すべき情報が本当にあるか
+固定Sceneだけでなく、その後2〜3Turn自由会話も行う。
 
 ---
 
-## 各Runで記録するもの
+## User Review Metrics
 
-レビュー用ページが自動記録：
+### Primary
 
-- 所要時間
-- 操作回数
-- 選択Trait数
-- Culture数
-- 追加確認数
-- Free Note使用有無
-- 完成時の入力内容
+```text
+Character Fidelity 1〜5
+想像した人物として会話できた感覚
+```
 
-ユーザーが記録：
+### Input
 
-- 入力しやすさ 1〜5
-- 想像した人物を表現できた感覚 1〜5
-- 項目量の適切さ 1〜5
-- Traitの意味の分かりやすさ 1〜5
-- Culture入力の分かりやすさ 1〜5
-- 迷った箇所
-- 足りなかったもの
-- 不要に感じたもの
-- その他コメント
+```text
+入力しやすさ
+項目量
+欲しいTrait / Cultureが見つかったか
+迷った項目
+Free Note依存
+```
 
----
+### Output
 
-## レビュー中の注意
-
-- 迷った場合は、後から仕様を調べず「迷った」と記録する。
-- 選び直しも操作回数として残す。選び直しが多い箇所はUI改善候補。
-- Free Noteを使ったこと自体を失敗とは扱わない。ただし毎回Free Noteが必要ならStructured UI不足を疑う。
-- 1人レビューなので数値を統計的な合否には使わない。主目的は **具体的な摩擦箇所の発見**。
-- Internal AI Testの高得点を理由に、ユーザーが分かりにくいUIを残さない。
+```text
+Personality correctness
+Culture naturalness
+Relationship / User Stance correctness
+Unwanted added personality
+Missing selected feature
+Naturalness
+Consistency across turns
+```
 
 ---
 
-## Review後に判断すること
+## Failure Classification
 
-1. Main Traitの数と分類は適切か
-2. 「もう少し設定」へ移す / Mainへ戻すTraitはあるか
-3. Adaptiveは `感情豊か + 淡々` 1問でよいか
-4. Culture Core ★ は必要か / 単一Cultureでも指定可能にすべきか
-5. Relationship / User StanceのUI表現は理解しやすいか
-6. Free Noteで十分な領域と、Structured入力が必要な領域は何か
-7. Trait ★ 案を復活させて比較する価値があるか
-8. Personality UIをfreezeしてCulture改善へ進める状態か
+「キャラが違う」で終わらせず、可能なら次へ分類する。
 
-レビュー結果を設計変更へ反映する前に、一度まとめてReviewする。
+```text
+A. Input / UI
+想像した人物を入力できなかった
+
+B. Compiler Interpretation
+入力した意味がProduction Promptへ正しく変換されなかった
+
+C. Production Prompt
+意味は理解されたが、実行指示として不足・過剰だった
+
+D. RP Realization / Model Variance
+Promptは妥当だが、RP AIのその出力だけ外れた
+```
+
+---
+
+## Review中の注意
+
+- Internal AI Regressionの高得点を理由にHuman Reviewの違和感を無視しない。
+- Cultureが毎Turn見えることを成功条件にしない。無関係Sceneで消えるのが正しい場合がある。
+- Traitも毎Turn演技させる必要はない。
+- 明示していない人格が追加されたら記録する。
+- 明示した極端な性質が勝手に善良化・弱化された場合も記録する。
+- 1人Reviewの数値を統計的合否として扱わない。具体的な摩擦・Fidelity failure発見を優先する。
+
+---
+
+## Review後の修正優先順位
+
+```text
+1. Character Fidelity failure
+2. Input UIで表現不能
+3. Over-inference / missing feature
+4. Culture naturalness
+5. Relationship mismatch
+6. Input Cost
+7. UI polish
+```
+
+問題箇所を修正した後、必要なTargeted Regressionだけ実施する。
+
+新しい内部Parameter研究をHuman Reviewより優先しない。
+
+---
+
+## v0.5 Review-ready条件
+
+```text
+[ ] UIからPersonality 2〜4推奨 / 6上限目安で入力可能
+[ ] Culture 1〜4を入力可能
+[ ] Relationship / User Stance / Free Note入力可能
+[ ] 必要時だけAdaptive表示
+[ ] Portable Compiler Requestを生成・コピー可能
+[ ] Fresh Chat AでStandalone Production RP Prompt生成可能
+[ ] Fresh Chat BでRP可能
+[ ] Review結果を記録可能
+```
+
+現在の次工程は、既存UI PrototypeをこのFlowへ接続すること。
