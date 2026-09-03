@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card Game Prototype v0.1</title>
+<style>
+:root{
+  --bg:#11151b;--panel:#1b222c;--panel2:#232c38;--line:#3b4655;--text:#f4f7fb;--muted:#aeb8c5;
+  --accent:#7cb8ff;--danger:#ff7b7b;--good:#7edc9a;--gold:#ffd36d;--card:#f5f0e7;--cardText:#1b1d22;
+}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0d1117,#151b23);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
+button{font:inherit}.app{width:min(1180px,100%);margin:0 auto;padding:18px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.title h1{font-size:20px;margin:0}.title p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.pill{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 11px;font-size:13px}.pill.turn-player{border-color:var(--accent);color:#dcecff}.pill.turn-cpu{border-color:var(--danger);color:#ffdcdc}
+.game{display:grid;grid-template-rows:auto auto auto;gap:10px}.side{background:rgba(27,34,44,.96);border:1px solid var(--line);border-radius:14px;padding:12px}.hero-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.hero{display:flex;align-items:center;gap:10px}.avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--line);font-weight:800}.hero-name{font-weight:800}.hero-stats{display:flex;gap:8px;margin-top:3px;font-size:13px}.hp{color:#ffb4b4}.mana{color:#b8d9ff}.deck{color:#d9dce2}.hero-target{cursor:pointer;transition:.15s}.hero-target.attackable{outline:2px solid var(--danger);outline-offset:2px}.hero-target:hover.attackable{transform:translateY(-1px)}
+.zone-title{display:flex;justify-content:space-between;align-items:center;margin:10px 0 7px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.board{min-height:154px;display:grid;grid-template-columns:repeat(5,minmax(96px,1fr));gap:8px}.slot{border:1px dashed #465364;border-radius:11px;min-height:146px;display:flex;align-items:center;justify-content:center;color:#667486;font-size:12px}.card{position:relative;min-height:146px;border-radius:11px;background:linear-gradient(180deg,#fffaf0,#eee6d9);border:2px solid #d2c9bb;color:var(--cardText);padding:9px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 16px rgba(0,0,0,.18);user-select:none}.card.clickable{cursor:pointer}.card.clickable:hover{transform:translateY(-2px)}.card.selected{outline:3px solid var(--accent);outline-offset:2px}.card.attackable-target{outline:3px solid var(--danger);outline-offset:2px;cursor:pointer}.card.exhausted{opacity:.64}.card.unplayable{opacity:.52}.card-head{display:flex;justify-content:space-between;gap:6px;align-items:flex-start}.card-name{font-weight:850;font-size:14px}.cost{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#d7eaff;border:1px solid #86b8ea;font-weight:900}.card-body{font-size:11px;color:#5c6067;text-align:center;padding:4px}.stats{display:flex;justify-content:space-between;font-weight:900;font-size:17px}.atk{color:#a15028}.chp{color:#a52836}.badge{position:absolute;left:7px;top:36px;background:#1e2732;color:#fff;border-radius:6px;padding:2px 5px;font-size:9px;font-weight:700}
+.mid{display:grid;grid-template-columns:1fr 260px;gap:10px}.hand-panel,.log-panel{background:rgba(27,34,44,.96);border:1px solid var(--line);border-radius:14px;padding:12px}.hand{min-height:170px;display:flex;gap:8px;overflow-x:auto;padding:4px 2px}.hand .card{width:126px;min-width:126px}.controls{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px}.hint{font-size:12px;color:var(--muted)}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}.btn.primary{background:#2d6fb3;border-color:#4b94df}.btn:disabled{opacity:.45;cursor:not-allowed}.log{height:168px;overflow:auto;font-size:12px;line-height:1.55;background:#121820;border-radius:9px;padding:8px;border:1px solid #2d3744}.log div{margin-bottom:4px}.log .cpu{color:#ffb4b4}.log .player{color:#b8d9ff}.log .system{color:#c9cfd8}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}.modal{width:min(420px,100%);background:#1b222c;border:1px solid #566274;border-radius:16px;padding:24px;text-align:center;box-shadow:0 20px 70px rgba(0,0,0,.5)}.modal h2{font-size:34px;margin:0 0 8px}.modal p{color:var(--muted);margin:0 0 18px}.rules{font-size:11px;color:var(--muted);margin-top:8px}
+@media(max-width:820px){.mid{grid-template-columns:1fr}.log{height:120px}.board{grid-template-columns:repeat(5,110px);overflow-x:auto}.side{overflow:hidden}.topbar{align-items:flex-start;flex-direction:column}.status{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title"><h1>Card Game Prototype v0.1</h1><p>Unity実装前のルール検証用・最小カードゲーム</p></div>
+    <div class="status"><div id="turnPill" class="pill">準備中</div><div id="roundPill" class="pill">Turn 1</div></div>
+  </div>
+
+  <div class="game">
+    <section class="side">
+      <div class="hero-row">
+        <div id="cpuHero" class="hero hero-target">
+          <div class="avatar">CPU</div>
+          <div><div class="hero-name">CPU</div><div class="hero-stats"><span id="cpuHp" class="hp"></span><span id="cpuMana" class="mana"></span><span id="cpuDeck" class="deck"></span></div></div>
+        </div>
+        <div id="cpuHandCount" class="pill">手札 0</div>
+      </div>
+      <div class="zone-title"><span>CPU Board</span><span id="cpuBoardCount">0 / 5</span></div>
+      <div id="cpuBoard" class="board"></div>
+    </section>
+
+    <div class="mid">
+      <section class="hand-panel">
+        <div class="zone-title"><span>Player Board</span><span id="playerBoardCount">0 / 5</span></div>
+        <div id="playerBoard" class="board"></div>
+        <div class="hero-row" style="margin-top:10px">
+          <div class="hero">
+            <div class="avatar">YOU</div>
+            <div><div class="hero-name">Player</div><div class="hero-stats"><span id="playerHp" class="hp"></span><span id="playerMana" class="mana"></span><span id="playerDeck" class="deck"></span></div></div>
+          </div>
+          <button id="endTurnBtn" class="btn primary">END TURN</button>
+        </div>
+        <div class="zone-title"><span>Hand</span><span id="playerHandCount">0 cards</span></div>
+        <div id="playerHand" class="hand"></div>
+        <div class="controls"><div id="hint" class="hint">手札のカードをクリックして召喚します。</div><button id="cancelBtn" class="btn" disabled>選択解除</button></div>
+        <div class="rules">ルール: HP20 / デッキ20 / 初手3 / 毎ターン1ドロー / マナは毎ターン+1して全回復 / 盤面5体 / 召喚ターンは攻撃不可 / 1体1回攻撃 / デッキ切れで敗北</div>
+      </section>
+
+      <aside class="log-panel">
+        <div class="zone-title"><span>Battle Log</span><button id="restartBtn" class="btn" style="padding:6px 9px;font-size:11px">Restart</button></div>
+        <div id="log" class="log"></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div id="overlay" class="overlay"><div class="modal"><h2 id="resultTitle">YOU WIN</h2><p id="resultText"></p><button id="retryBtn" class="btn primary">RETRY</button></div></div>
+
+<script>
+(() => {
+  const BOARD_LIMIT = 5;
+  const MAX_MANA = 10;
+  let nextId = 1;
+
+  const CARD_TYPES = {
+    small:   { key:'small',   name:'Small',   cost:1, attack:1, health:2 },
+    soldier: { key:'soldier', name:'Soldier', cost:2, attack:2, health:3 },
+    heavy:   { key:'heavy',   name:'Heavy',   cost:4, attack:4, health:5 }
+  };
+
+  const $ = id => document.getElementById(id);
+  const els = {
+    cpuHp:$('cpuHp'),cpuMana:$('cpuMana'),cpuDeck:$('cpuDeck'),cpuHandCount:$('cpuHandCount'),cpuBoard:$('cpuBoard'),cpuBoardCount:$('cpuBoardCount'),cpuHero:$('cpuHero'),
+    playerHp:$('playerHp'),playerMana:$('playerMana'),playerDeck:$('playerDeck'),playerHand:$('playerHand'),playerHandCount:$('playerHandCount'),playerBoard:$('playerBoard'),playerBoardCount:$('playerBoardCount'),
+    turnPill:$('turnPill'),roundPill:$('roundPill'),endTurnBtn:$('endTurnBtn'),cancelBtn:$('cancelBtn'),hint:$('hint'),log:$('log'),restartBtn:$('restartBtn'),overlay:$('overlay'),resultTitle:$('resultTitle'),resultText:$('resultText'),retryBtn:$('retryBtn')
+  };
+
+  let state;
+
+  function makeCard(typeKey){
+    const base = CARD_TYPES[typeKey];
+    return { id: nextId++, ...base, currentHealth:base.health, hasAttacked:false, summonedThisTurn:false };
+  }
+
+  function makeDeck(){
+    const cards = [];
+    for(let i=0;i<8;i++) cards.push(makeCard('small'));
+    for(let i=0;i<8;i++) cards.push(makeCard('soldier'));
+    for(let i=0;i<4;i++) cards.push(makeCard('heavy'));
+    return shuffle(cards);
+  }
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+  }
+
+  function makeSide(){ return { hp:20, maxMana:0, mana:0, deck:makeDeck(), hand:[], board:[] }; }
+
+  function newGame(){
+    nextId=1;
+    state={ player:makeSide(), cpu:makeSide(), turn:'player', round:1, gameOver:false, selectedAttackerId:null, cpuBusy:false };
+    els.overlay.classList.remove('show');
+    els.log.innerHTML='';
+    drawInitial(state.player,'player');
+    drawInitial(state.cpu,'cpu');
+    addLog('ゲーム開始。Playerの先攻です。','system');
+    startTurn('player');
+  }
+
+  function drawInitial(side,who){ for(let i=0;i<3;i++) if(!drawCard(side,who,false)) return; }
+
+  function drawCard(side,who,announce=true){
+    if(side.deck.length===0){
+      endGame(who==='player'?'cpu':'player', `${who==='player'?'Player':'CPU'} のデッキが尽きました。`);
+      return false;
+    }
+    side.hand.push(side.deck.pop());
+    if(announce) addLog(`${who==='player'?'Player':'CPU'} が1枚ドロー。`, who);
+    return true;
+  }
+
+  function startTurn(who){
+    if(state.gameOver) return;
+    state.turn=who;
+    state.selectedAttackerId=null;
+    const side=state[who];
+    side.maxMana=Math.min(MAX_MANA,side.maxMana+1);
+    side.mana=side.maxMana;
+    side.board.forEach(c=>{ c.hasAttacked=false; c.summonedThisTurn=false; });
+    addLog(`${who==='player'?'Player':'CPU'} ターン開始。Mana ${side.mana}/${side.maxMana}`,who);
+    if(!drawCard(side,who,true)) return;
+    render();
+    if(who==='cpu') runCpuTurn();
+  }
+
+  function canPlay(side,card){ return !state.gameOver && side.mana>=card.cost && side.board.length<BOARD_LIMIT; }
+
+  function playPlayerCard(cardId){
+    if(state.turn!=='player'||state.gameOver||state.cpuBusy) return;
+    const i=state.player.hand.findIndex(c=>c.id===cardId); if(i<0) return;
+    const card=state.player.hand[i];
+    if(state.player.board.length>=BOARD_LIMIT){ setHint('盤面が満杯です。'); return; }
+    if(state.player.mana<card.cost){ setHint('Manaが足りません。'); return; }
+    state.player.mana-=card.cost; state.player.hand.splice(i,1); card.summonedThisTurn=true; card.hasAttacked=false; state.player.board.push(card);
+    state.selectedAttackerId=null;
+    addLog(`Player が ${card.name} (${card.attack}/${card.health}) を召喚。`,'player');
+    setHint('召喚しました。攻撃可能なユニットを選べます。');
+    render();
+  }
+
+  function selectPlayerAttacker(cardId){
+    if(state.turn!=='player'||state.gameOver||state.cpuBusy) return;
+    const card=state.player.board.find(c=>c.id===cardId); if(!card) return;
+    if(card.summonedThisTurn){ setHint('召喚したターンは攻撃できません。'); return; }
+    if(card.hasAttacked){ setHint('このユニットは既に攻撃済みです。'); return; }
+    state.selectedAttackerId=state.selectedAttackerId===cardId?null:cardId;
+    setHint(state.selectedAttackerId?'攻撃対象を選んでください。':'選択を解除しました。');
+    render();
+  }
+
+  function attackCpuUnit(targetId){
+    if(state.turn!=='player'||state.gameOver) return;
+    const attacker=state.player.board.find(c=>c.id===state.selectedAttackerId);
+    const target=state.cpu.board.find(c=>c.id===targetId);
+    if(!attacker||!target||attacker.hasAttacked||attacker.summonedThisTurn) return;
+    resolveUnitCombat(attacker,target,'player');
+    attacker.hasAttacked=true; state.selectedAttackerId=null;
+    cleanupDead();
+    checkHpGameOver();
+    render();
+  }
+
+  function attackCpuHero(){
+    if(state.turn!=='player'||state.gameOver) return;
+    const attacker=state.player.board.find(c=>c.id===state.selectedAttackerId);
+    if(!attacker||attacker.hasAttacked||attacker.summonedThisTurn) return;
+    state.cpu.hp-=attacker.attack; attacker.hasAttacked=true;
+    addLog(`${attacker.name} が CPU 本体へ ${attacker.attack} ダメージ。`,'player');
+    state.selectedAttackerId=null; checkHpGameOver(); render();
+  }
+
+  function resolveUnitCombat(attacker,defender,who){
+    const a=attacker.attack,d=defender.attack;
+    defender.currentHealth-=a; attacker.currentHealth-=d;
+    addLog(`${attacker.name} ${a}/${attacker.currentHealth+d} → ${defender.name} に${a}ダメージ / 反撃${d}ダメージ。`,who);
+  }
+
+  function cleanupDead(){
+    ['player','cpu'].forEach(who=>{
+      const side=state[who];
+      const dead=side.board.filter(c=>c.currentHealth<=0);
+      dead.forEach(c=>addLog(`${who==='player'?'Player':'CPU'} の ${c.name} が破壊されました。`,'system'));
+      side.board=side.board.filter(c=>c.currentHealth>0);
+    });
+  }
+
+  function checkHpGameOver(){
+    if(state.player.hp<=0) return endGame('cpu','Player HP が0になりました。');
+    if(state.cpu.hp<=0) return endGame('player','CPU HP が0になりました。');
+  }
+
+  function endPlayerTurn(){
+    if(state.turn!=='player'||state.gameOver||state.cpuBusy) return;
+    state.selectedAttackerId=null; addLog('Player がターン終了。','player');
+    render(); setTimeout(()=>startTurn('cpu'),350);
+  }
+
+  async function runCpuTurn(){
+    if(state.gameOver) return;
+    state.cpuBusy=true; render();
+    await pause(450);
+    while(!state.gameOver && state.cpu.board.length<BOARD_LIMIT){
+      const playable=state.cpu.hand.filter(c=>c.cost<=state.cpu.mana);
+      if(playable.length===0) break;
+      playable.sort((a,b)=>b.cost-a.cost || b.attack-a.attack);
+      const card=playable[0];
+      const idx=state.cpu.hand.findIndex(c=>c.id===card.id);
+      state.cpu.mana-=card.cost; state.cpu.hand.splice(idx,1); card.summonedThisTurn=true; card.hasAttacked=false; state.cpu.board.push(card);
+      addLog(`CPU が ${card.name} (${card.attack}/${card.health}) を召喚。`,'cpu'); render(); await pause(350);
+    }
+
+    const attackers=[...state.cpu.board].filter(c=>!c.summonedThisTurn&&!c.hasAttacked);
+    for(const attacker of attackers){
+      if(state.gameOver) break;
+      const liveAttacker=state.cpu.board.find(c=>c.id===attacker.id); if(!liveAttacker) continue;
+      await pause(350);
+      const attackUnit=state.player.board.length>0 && Math.random()<0.65;
+      if(attackUnit){
+        const target=state.player.board[Math.floor(Math.random()*state.player.board.length)];
+        resolveUnitCombat(liveAttacker,target,'cpu'); liveAttacker.hasAttacked=true; cleanupDead();
+      }else{
+        state.player.hp-=liveAttacker.attack; liveAttacker.hasAttacked=true;
+        addLog(`${liveAttacker.name} が Player 本体へ ${liveAttacker.attack} ダメージ。`,'cpu');
+      }
+      checkHpGameOver(); render();
+    }
+
+    if(!state.gameOver){
+      await pause(350); addLog('CPU がターン終了。','cpu'); state.cpuBusy=false; state.round++; render(); startTurn('player');
+    }else state.cpuBusy=false;
+  }
+
+  function endGame(winner,reason){
+    if(state.gameOver) return;
+    state.gameOver=true; state.cpuBusy=false; state.selectedAttackerId=null;
+    const win=winner==='player';
+    els.resultTitle.textContent=win?'YOU WIN':'YOU LOSE';
+    els.resultText.textContent=reason;
+    els.overlay.classList.add('show');
+    addLog(`${win?'Player':'CPU'} の勝利。${reason}`,'system');
+    render();
+  }
+
+  function pause(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function setHint(text){ els.hint.textContent=text; }
+  function addLog(text,type='system'){ const d=document.createElement('div'); d.className=type; d.textContent=text; els.log.appendChild(d); els.log.scrollTop=els.log.scrollHeight; }
+
+  function cardHtml(card,opts={}){
+    const classes=['card'];
+    if(opts.clickable) classes.push('clickable');
+    if(opts.selected) classes.push('selected');
+    if(opts.target) classes.push('attackable-target');
+    if(opts.exhausted) classes.push('exhausted');
+    if(opts.unplayable) classes.push('unplayable');
+    const badge=card.summonedThisTurn?'<span class="badge">召喚酔い</span>':(card.hasAttacked?'<span class="badge">攻撃済み</span>':'');
+    return `<div class="${classes.join(' ')}" data-id="${card.id}">${badge}<div class="card-head"><div class="card-name">${card.name}</div><div class="cost">${card.cost}</div></div><div class="card-body">Unit</div><div class="stats"><span class="atk">⚔ ${card.attack}</span><span class="chp">♥ ${card.currentHealth}</span></div></div>`;
+  }
+
+  function renderBoard(el,side,who){
+    const isPlayer=who==='player';
+    let html='';
+    for(let i=0;i<BOARD_LIMIT;i++){
+      const c=side.board[i];
+      if(!c){ html+='<div class="slot">EMPTY</div>'; continue; }
+      const selected=isPlayer && c.id===state.selectedAttackerId;
+      const canAttack=isPlayer && state.turn==='player' && !state.gameOver && !state.cpuBusy && !c.summonedThisTurn && !c.hasAttacked;
+      const target=!isPlayer && !!state.selectedAttackerId;
+      html+=cardHtml(c,{clickable:canAttack,selected,target,exhausted:isPlayer&&(c.summonedThisTurn||c.hasAttacked)});
+    }
+    el.innerHTML=html;
+    [...el.querySelectorAll('.card')].forEach(node=>{
+      const id=Number(node.dataset.id);
+      if(isPlayer) node.addEventListener('click',()=>selectPlayerAttacker(id));
+      else if(state.selectedAttackerId) node.addEventListener('click',()=>attackCpuUnit(id));
+    });
+  }
+
+  function renderHand(){
+    const p=state.player;
+    els.playerHand.innerHTML=p.hand.map(c=>cardHtml(c,{clickable:state.turn==='player'&&!state.gameOver&&!state.cpuBusy&&canPlay(p,c),unplayable:!canPlay(p,c)})).join('');
+    [...els.playerHand.querySelectorAll('.card')].forEach(node=>node.addEventListener('click',()=>playPlayerCard(Number(node.dataset.id))));
+  }
+
+  function render(){
+    if(!state) return;
+    const p=state.player,c=state.cpu;
+    els.playerHp.textContent=`HP ${Math.max(0,p.hp)}`; els.playerMana.textContent=`Mana ${p.mana}/${p.maxMana}`; els.playerDeck.textContent=`Deck ${p.deck.length}`;
+    els.cpuHp.textContent=`HP ${Math.max(0,c.hp)}`; els.cpuMana.textContent=`Mana ${c.mana}/${c.maxMana}`; els.cpuDeck.textContent=`Deck ${c.deck.length}`;
+    els.cpuHandCount.textContent=`手札 ${c.hand.length}`; els.playerHandCount.textContent=`${p.hand.length} cards`; els.playerBoardCount.textContent=`${p.board.length} / ${BOARD_LIMIT}`; els.cpuBoardCount.textContent=`${c.board.length} / ${BOARD_LIMIT}`;
+    els.roundPill.textContent=`Turn ${state.round}`;
+    els.turnPill.textContent=state.gameOver?'GAME OVER':(state.turn==='player'?'PLAYER TURN':'CPU TURN');
+    els.turnPill.className=`pill ${state.turn==='player'?'turn-player':'turn-cpu'}`;
+    els.endTurnBtn.disabled=state.turn!=='player'||state.gameOver||state.cpuBusy;
+    els.cancelBtn.disabled=!state.selectedAttackerId;
+    els.cpuHero.classList.toggle('attackable',!!state.selectedAttackerId && state.turn==='player'&&!state.gameOver);
+    renderBoard(els.playerBoard,p,'player'); renderBoard(els.cpuBoard,c,'cpu'); renderHand();
+  }
+
+  els.endTurnBtn.addEventListener('click',endPlayerTurn);
+  els.cancelBtn.addEventListener('click',()=>{state.selectedAttackerId=null;setHint('選択を解除しました。');render();});
+  els.cpuHero.addEventListener('click',()=>{ if(state.selectedAttackerId) attackCpuHero(); });
+  els.restartBtn.addEventListener('click',newGame); els.retryBtn.addEventListener('click',newGame);
+  newGame();
+})();
+</script>
+</body>
+</html>
